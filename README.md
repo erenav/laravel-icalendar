@@ -1,5 +1,11 @@
 # vanere/laravel-icalendar
 
+[![Latest Version](https://img.shields.io/packagist/v/vanere/laravel-icalendar.svg)](https://packagist.org/packages/vanere/laravel-icalendar)
+[![Tests](https://github.com/vanere/laravel-icalendar/actions/workflows/ci.yml/badge.svg)](https://github.com/vanere/laravel-icalendar/actions/workflows/ci.yml)
+[![PHP Version](https://img.shields.io/packagist/php-v/vanere/laravel-icalendar.svg)](https://packagist.org/packages/vanere/laravel-icalendar)
+[![Total Downloads](https://img.shields.io/packagist/dt/vanere/laravel-icalendar.svg)](https://packagist.org/packages/vanere/laravel-icalendar)
+[![License](https://img.shields.io/packagist/l/vanere/laravel-icalendar.svg)](LICENSE)
+
 Laravel integration for [`vanere/icalendar`](https://github.com/vanere/icalendar) — build,
 serve, parse, and attach iCalendar (`.ics`) feeds from your Laravel app, with first-class
 Eloquent and Carbon support.

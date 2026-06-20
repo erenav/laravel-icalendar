@@ -6,6 +6,15 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-20
+
+### Added
+- `CalendarAttachment` now advertises the calendar's iTIP METHOD in the MIME type
+  (`text/calendar; method=REQUEST`), so mail clients recognise the attachment as an
+  invitation.
+
+## [0.1.0] - 2026-06-20
+
 ### Added
 - Initial Laravel integration for [`vanere/icalendar`](https://github.com/vanere/icalendar).
 - Auto-discovered service provider, publishable `config/icalendar.php`, and the
@@ -17,3 +26,7 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
   `text/calendar` feeds.
 - `CalendarAttachment::for()` to attach a calendar to Mailables / notification mail messages.
 - `icalendar:validate` Artisan command.
+
+[Unreleased]: https://github.com/vanere/laravel-icalendar/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/vanere/laravel-icalendar/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/vanere/laravel-icalendar/releases/tag/0.1.0

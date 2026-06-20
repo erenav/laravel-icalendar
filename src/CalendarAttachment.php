@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vanere\LaravelICalendar;
 
 use Illuminate\Mail\Attachment;
+use Vanere\ICalendar\Component\Calendar;
 use Vanere\ICalendar\Component\Component;
 
 /**
@@ -12,6 +13,9 @@ use Vanere\ICalendar\Component\Component;
  * Mailables and notification `MailMessage`s:
  *
  *     $message->attach(CalendarAttachment::for($calendar));
+ *
+ * When the calendar carries an iTIP METHOD (e.g. REQUEST), it is advertised in
+ * the MIME type so mail clients treat the attachment as an invitation.
  */
 final class CalendarAttachment
 {
@@ -22,7 +26,12 @@ final class CalendarAttachment
     ): Attachment {
         $manager ??= app(ICalendarManager::class);
 
+        $mime = 'text/calendar; charset=utf-8';
+        if ($component instanceof Calendar && ($method = $component->method()) !== null) {
+            $mime .= '; method=' . strtoupper($method);
+        }
+
         return Attachment::fromData(static fn (): string => $manager->serialize($component), $filename)
-            ->withMime('text/calendar; charset=utf-8');
+            ->withMime($mime);
     }
 }

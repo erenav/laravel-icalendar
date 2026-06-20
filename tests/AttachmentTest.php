@@ -21,4 +21,16 @@ final class AttachmentTest extends TestCase
         $this->assertSame('invite.ics', $attachment->as);
         $this->assertStringContainsString('text/calendar', (string) $attachment->mime);
     }
+
+    public function test_itip_method_is_advertised_in_mime(): void
+    {
+        $calendar = ICalendar::calendar()
+            ->method('REQUEST')
+            ->add(Event::build()->uid('1@test')->summary('Invite'))
+            ->get();
+
+        $attachment = CalendarAttachment::for($calendar);
+
+        $this->assertStringContainsString('method=REQUEST', (string) $attachment->mime);
+    }
 }

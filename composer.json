@@ -1,0 +1,48 @@
+{
+    "name": "vanere/laravel-icalendar",
+    "description": "Laravel integration for vanere/icalendar — build, serve, and parse iCalendar feeds in Laravel.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["laravel", "icalendar", "ical", "ics", "calendar", "rfc5545", "feed"],
+    "homepage": "https://github.com/vanere/laravel-icalendar",
+    "authors": [
+        {
+            "name": "vanere",
+            "homepage": "https://github.com/vanere"
+        }
+    ],
+    "require": {
+        "php": ">=8.3",
+        "vanere/icalendar": "^0.2",
+        "illuminate/support": "^11.0 || ^12.0",
+        "illuminate/contracts": "^11.0 || ^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0 || ^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vanere\\LaravelICalendar\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Vanere\\LaravelICalendar\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Vanere\\LaravelICalendar\\ICalendarServiceProvider"
+            ],
+            "aliases": {
+                "ICalendar": "Vanere\\LaravelICalendar\\Facades\\ICalendar"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

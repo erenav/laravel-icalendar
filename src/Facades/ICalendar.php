@@ -17,7 +17,7 @@ use Vanere\LaravelICalendar\ICalendarManager;
  * @method static EventBuilder event()
  * @method static Calendar parse(string $ics)
  * @method static string serialize(Component $component)
- * @method static Calendar fromModels(iterable $models)
+ * @method static Calendar fromModels(iterable<\Vanere\LaravelICalendar\Contracts\ProvidesCalendarEvent> $models)
  * @method static CalendarResponse response(Component $component, ?string $filename = null)
  *
  * @see ICalendarManager

@@ -16,7 +16,13 @@ final class ValidateCommand extends Command
 
     public function handle(): int
     {
-        $path = (string) $this->argument('path');
+        $path = $this->argument('path');
+
+        if (! is_string($path)) {
+            $this->error('A file path is required.');
+
+            return self::FAILURE;
+        }
 
         if (! is_file($path)) {
             $this->error("File not found: {$path}");
@@ -27,7 +33,7 @@ final class ValidateCommand extends Command
         try {
             $calendar = Parser::strict()->parseCalendar((string) file_get_contents($path));
         } catch (ICalendarException $e) {
-            $this->error('Invalid iCalendar: ' . $e->getMessage());
+            $this->error('Invalid iCalendar: '.$e->getMessage());
 
             return self::FAILURE;
         }

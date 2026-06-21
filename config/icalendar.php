@@ -11,7 +11,7 @@ return [
     | Stamped onto calendars created via ICalendar::calendar(). Identifies the
     | software that generated the file.
     */
-    'product_id' => '-//' . env('APP_NAME', 'Laravel') . '//iCalendar//EN',
+    'product_id' => '-//'.env('APP_NAME', 'Laravel').'//iCalendar//EN',
 
     /*
     |--------------------------------------------------------------------------

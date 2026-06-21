@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Vanere\LaravelICalendar\Concerns;
 
+use Vanere\LaravelICalendar\Contracts\ProvidesCalendarEvent;
 use Vanere\LaravelICalendar\ICalendarManager;
 
 use function Illuminate\Support\enum_value;
 
 /**
  * Helper for Eloquent models implementing
- * {@see \Vanere\LaravelICalendar\Contracts\ProvidesCalendarEvent}.
+ * {@see ProvidesCalendarEvent}.
  *
  * Provides a stable, deterministic UID (so re-exporting the same record yields
  * the same UID rather than duplicating it in calendar clients) and a convenience

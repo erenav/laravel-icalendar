@@ -19,11 +19,10 @@ use Vanere\LaravelICalendar\Contracts\ProvidesCalendarEvent;
  */
 class ICalendarManager
 {
-    /** @param array<string, mixed> $config */
+    /** @param array<array-key, mixed> $config */
     public function __construct(
         private readonly array $config = [],
-    ) {
-    }
+    ) {}
 
     /** A calendar builder pre-stamped with the configured PRODID. */
     public function calendar(): CalendarBuilder
@@ -61,7 +60,7 @@ class ICalendarManager
     /**
      * Build a calendar from a collection of models that map themselves to events.
      *
-     * @param iterable<ProvidesCalendarEvent> $models
+     * @param  iterable<ProvidesCalendarEvent>  $models
      */
     public function fromModels(iterable $models): Calendar
     {
@@ -76,9 +75,11 @@ class ICalendarManager
     /** Wrap a component in a downloadable text/calendar HTTP response. */
     public function response(Component $component, ?string $filename = null): CalendarResponse
     {
+        $default = $this->config['filename'] ?? 'calendar.ics';
+
         return new CalendarResponse(
             $component,
-            $filename ?? (string) ($this->config['filename'] ?? 'calendar.ics'),
+            $filename ?? (is_string($default) ? $default : 'calendar.ics'),
             $this,
         );
     }

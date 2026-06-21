@@ -19,8 +19,7 @@ final class CalendarResponse implements Responsable
         private readonly Component $component,
         private readonly string $filename = 'calendar.ics',
         private readonly ?ICalendarManager $manager = null,
-    ) {
-    }
+    ) {}
 
     public function toResponse($request): Response
     {

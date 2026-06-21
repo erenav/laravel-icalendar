@@ -28,7 +28,7 @@ final class CalendarAttachment
 
         $mime = 'text/calendar; charset=utf-8';
         if ($component instanceof Calendar && ($method = $component->method()) !== null) {
-            $mime .= '; method=' . strtoupper($method);
+            $mime .= '; method='.strtoupper($method);
         }
 
         return Attachment::fromData(static fn (): string => $manager->serialize($component), $filename)

@@ -1,0 +1,11 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: max
+    paths:
+        - src
+    ignoreErrors:
+        # InteractsWithCalendar is a public-API trait for consumers; it has no
+        # user inside the package itself, which is expected for a library trait.
+        - identifier: trait.unused

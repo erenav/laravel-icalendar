@@ -1,19 +1,19 @@
 {
-    "name": "vanere/laravel-icalendar",
-    "description": "Laravel integration for vanere/icalendar — build, serve, and parse iCalendar feeds in Laravel.",
+    "name": "erenav/laravel-icalendar",
+    "description": "Laravel integration for erenav/icalendar — build, serve, and parse iCalendar feeds in Laravel.",
     "type": "library",
     "license": "MIT",
     "keywords": ["laravel", "icalendar", "ical", "ics", "calendar", "rfc5545", "feed"],
-    "homepage": "https://github.com/vanere/laravel-icalendar",
+    "homepage": "https://github.com/erenav/laravel-icalendar",
     "authors": [
         {
-            "name": "vanere",
-            "homepage": "https://github.com/vanere"
+            "name": "erenav",
+            "homepage": "https://github.com/erenav"
         }
     ],
     "require": {
         "php": ">=8.3",
-        "vanere/icalendar": ">=0.2 <2.0",
+        "erenav/icalendar": ">=0.2 <2.0",
         "illuminate/support": "^11.0 || ^12.0",
         "illuminate/contracts": "^11.0 || ^12.0"
     },
@@ -24,21 +24,21 @@
     },
     "autoload": {
         "psr-4": {
-            "Vanere\\LaravelICalendar\\": "src/"
+            "Erenav\\LaravelICalendar\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Vanere\\LaravelICalendar\\Tests\\": "tests/"
+            "Erenav\\LaravelICalendar\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Vanere\\LaravelICalendar\\ICalendarServiceProvider"
+                "Erenav\\LaravelICalendar\\ICalendarServiceProvider"
             ],
             "aliases": {
-                "ICalendar": "Vanere\\LaravelICalendar\\Facades\\ICalendar"
+                "ICalendar": "Erenav\\LaravelICalendar\\Facades\\ICalendar"
             }
         }
     },

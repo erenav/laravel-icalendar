@@ -2,11 +2,11 @@
 
 Copy-paste examples for common Laravel tasks. Everything goes through the `ICalendar`
 facade or the small set of helper classes. For the calendar/event modelling itself, see
-the [core recipes](https://github.com/vanere/icalendar/blob/main/docs/RECIPES.md).
+the [core recipes](https://github.com/erenav/icalendar/blob/main/docs/RECIPES.md).
 
 ```php
-use Vanere\LaravelICalendar\Facades\ICalendar;
-use Vanere\ICalendar\Component\Event;
+use Erenav\LaravelICalendar\Facades\ICalendar;
+use Erenav\ICalendar\Component\Event;
 ```
 
 ---
@@ -33,9 +33,9 @@ return response()->ics($calendar, 'events.ics');
 
 ```php
 use Illuminate\Database\Eloquent\Model;
-use Vanere\ICalendar\Component\Event;
-use Vanere\LaravelICalendar\Concerns\InteractsWithCalendar;
-use Vanere\LaravelICalendar\Contracts\ProvidesCalendarEvent;
+use Erenav\ICalendar\Component\Event;
+use Erenav\LaravelICalendar\Concerns\InteractsWithCalendar;
+use Erenav\LaravelICalendar\Contracts\ProvidesCalendarEvent;
 
 class Meeting extends Model implements ProvidesCalendarEvent
 {
@@ -78,8 +78,8 @@ $ics = $meeting->toIcs();
 ## Attach an invite to a notification
 
 ```php
-use Vanere\LaravelICalendar\CalendarAttachment;
-use Vanere\LaravelICalendar\Facades\ICalendar;
+use Erenav\LaravelICalendar\CalendarAttachment;
+use Erenav\LaravelICalendar\Facades\ICalendar;
 
 public function toMail($notifiable): MailMessage
 {

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar\Tests;
+namespace Erenav\LaravelICalendar\Tests;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use Vanere\ICalendar\Component\Event;
-use Vanere\ICalendar\ValueType\DateTimeValue;
-use Vanere\LaravelICalendar\Facades\ICalendar;
+use Erenav\ICalendar\Component\Event;
+use Erenav\ICalendar\ValueType\DateTimeValue;
+use Erenav\LaravelICalendar\Facades\ICalendar;
 
 final class ValidateCommandTest extends TestCase
 {

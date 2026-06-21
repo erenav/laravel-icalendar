@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar;
+namespace Erenav\LaravelICalendar;
 
-use Vanere\ICalendar\Builder\CalendarBuilder;
-use Vanere\ICalendar\Builder\EventBuilder;
-use Vanere\ICalendar\Component\Calendar;
-use Vanere\ICalendar\Component\Component;
-use Vanere\ICalendar\Component\Event;
-use Vanere\ICalendar\Parser\Parser;
-use Vanere\ICalendar\Serializer\IcsSerializer;
-use Vanere\LaravelICalendar\Contracts\ProvidesCalendarEvent;
+use Erenav\ICalendar\Builder\CalendarBuilder;
+use Erenav\ICalendar\Builder\EventBuilder;
+use Erenav\ICalendar\Component\Calendar;
+use Erenav\ICalendar\Component\Component;
+use Erenav\ICalendar\Component\Event;
+use Erenav\ICalendar\Parser\Parser;
+use Erenav\ICalendar\Serializer\IcsSerializer;
+use Erenav\LaravelICalendar\Contracts\ProvidesCalendarEvent;
 
 /**
  * The service behind the `ICalendar` facade: thin, config-aware sugar over the

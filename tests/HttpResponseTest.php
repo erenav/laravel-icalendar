@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar\Tests;
+namespace Erenav\LaravelICalendar\Tests;
 
-use Vanere\ICalendar\Component\Event;
-use Vanere\LaravelICalendar\CalendarResponse;
-use Vanere\LaravelICalendar\Facades\ICalendar;
+use Erenav\ICalendar\Component\Event;
+use Erenav\LaravelICalendar\CalendarResponse;
+use Erenav\LaravelICalendar\Facades\ICalendar;
 
 final class HttpResponseTest extends TestCase
 {

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar\Tests;
+namespace Erenav\LaravelICalendar\Tests;
 
+use Erenav\ICalendar\Component\Event;
+use Erenav\LaravelICalendar\Concerns\InteractsWithCalendar;
+use Erenav\LaravelICalendar\Contracts\ProvidesCalendarEvent;
+use Erenav\LaravelICalendar\Facades\ICalendar;
 use Illuminate\Database\Eloquent\Model;
-use Vanere\ICalendar\Component\Event;
-use Vanere\LaravelICalendar\Concerns\InteractsWithCalendar;
-use Vanere\LaravelICalendar\Contracts\ProvidesCalendarEvent;
-use Vanere\LaravelICalendar\Facades\ICalendar;
 
 final class FakeMeeting extends Model implements ProvidesCalendarEvent
 {

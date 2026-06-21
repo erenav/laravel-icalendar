@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar\Tests;
+namespace Erenav\LaravelICalendar\Tests;
 
+use Erenav\ICalendar\Component\Event;
+use Erenav\LaravelICalendar\CalendarAttachment;
+use Erenav\LaravelICalendar\Facades\ICalendar;
 use Illuminate\Mail\Attachment;
-use Vanere\ICalendar\Component\Event;
-use Vanere\LaravelICalendar\CalendarAttachment;
-use Vanere\LaravelICalendar\Facades\ICalendar;
 
 final class AttachmentTest extends TestCase
 {

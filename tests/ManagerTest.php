@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar\Tests;
+namespace Erenav\LaravelICalendar\Tests;
 
 use DateTimeImmutable;
-use Vanere\ICalendar\Builder\CalendarBuilder;
-use Vanere\ICalendar\Builder\EventBuilder;
-use Vanere\ICalendar\Component\Event;
-use Vanere\ICalendar\ValueType\DateTimeValue;
-use Vanere\LaravelICalendar\Facades\ICalendar;
-use Vanere\LaravelICalendar\ICalendarManager;
+use Erenav\ICalendar\Builder\CalendarBuilder;
+use Erenav\ICalendar\Builder\EventBuilder;
+use Erenav\ICalendar\Component\Event;
+use Erenav\ICalendar\ValueType\DateTimeValue;
+use Erenav\LaravelICalendar\Facades\ICalendar;
+use Erenav\LaravelICalendar\ICalendarManager;
 
 final class ManagerTest extends TestCase
 {

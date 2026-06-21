@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar;
+namespace Erenav\LaravelICalendar;
 
+use Erenav\ICalendar\Component\Component;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
-use Vanere\ICalendar\Component\Component;
 
 /**
  * A downloadable `text/calendar` HTTP response. Return it directly from a

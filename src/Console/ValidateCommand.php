@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar\Console;
+namespace Erenav\LaravelICalendar\Console;
 
+use Erenav\ICalendar\Exception\ICalendarException;
+use Erenav\ICalendar\Parser\Parser;
 use Illuminate\Console\Command;
-use Vanere\ICalendar\Exception\ICalendarException;
-use Vanere\ICalendar\Parser\Parser;
 
 final class ValidateCommand extends Command
 {

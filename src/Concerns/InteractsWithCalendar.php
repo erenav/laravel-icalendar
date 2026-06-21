@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar\Concerns;
+namespace Erenav\LaravelICalendar\Concerns;
 
-use Vanere\LaravelICalendar\Contracts\ProvidesCalendarEvent;
-use Vanere\LaravelICalendar\ICalendarManager;
+use Erenav\LaravelICalendar\Contracts\ProvidesCalendarEvent;
+use Erenav\LaravelICalendar\ICalendarManager;
 
 use function Illuminate\Support\enum_value;
 

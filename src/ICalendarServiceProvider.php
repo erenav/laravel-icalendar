@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar;
+namespace Erenav\LaravelICalendar;
 
+use Erenav\ICalendar\Component\Component;
+use Erenav\LaravelICalendar\Console\ValidateCommand;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\ServiceProvider;
-use Vanere\ICalendar\Component\Component;
-use Vanere\LaravelICalendar\Console\ValidateCommand;
 
 final class ICalendarServiceProvider extends ServiceProvider
 {

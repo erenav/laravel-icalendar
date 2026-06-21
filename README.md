@@ -1,18 +1,18 @@
-# vanere/laravel-icalendar
+# erenav/laravel-icalendar
 
-[![Latest Version](https://img.shields.io/packagist/v/vanere/laravel-icalendar.svg)](https://packagist.org/packages/vanere/laravel-icalendar)
-[![Tests](https://github.com/vanere/laravel-icalendar/actions/workflows/ci.yml/badge.svg)](https://github.com/vanere/laravel-icalendar/actions/workflows/ci.yml)
-[![PHP Version](https://img.shields.io/packagist/php-v/vanere/laravel-icalendar.svg)](https://packagist.org/packages/vanere/laravel-icalendar)
-[![Total Downloads](https://img.shields.io/packagist/dt/vanere/laravel-icalendar.svg)](https://packagist.org/packages/vanere/laravel-icalendar)
-[![License](https://img.shields.io/packagist/l/vanere/laravel-icalendar.svg)](LICENSE)
+[![Latest Version](https://img.shields.io/packagist/v/erenav/laravel-icalendar.svg)](https://packagist.org/packages/erenav/laravel-icalendar)
+[![Tests](https://github.com/erenav/laravel-icalendar/actions/workflows/ci.yml/badge.svg)](https://github.com/erenav/laravel-icalendar/actions/workflows/ci.yml)
+[![PHP Version](https://img.shields.io/packagist/php-v/erenav/laravel-icalendar.svg)](https://packagist.org/packages/erenav/laravel-icalendar)
+[![Total Downloads](https://img.shields.io/packagist/dt/erenav/laravel-icalendar.svg)](https://packagist.org/packages/erenav/laravel-icalendar)
+[![License](https://img.shields.io/packagist/l/erenav/laravel-icalendar.svg)](LICENSE)
 
-Laravel integration for [`vanere/icalendar`](https://github.com/vanere/icalendar) — build,
+Laravel integration for [`erenav/icalendar`](https://github.com/erenav/icalendar) — build,
 serve, parse, and attach iCalendar (`.ics`) feeds from your Laravel app, with first-class
 Eloquent and Carbon support.
 
 ```php
-use Vanere\LaravelICalendar\Facades\ICalendar;
-use Vanere\ICalendar\Component\Event;
+use Erenav\LaravelICalendar\Facades\ICalendar;
+use Erenav\ICalendar\Component\Event;
 
 return ICalendar::response(
     ICalendar::calendar()
@@ -22,7 +22,7 @@ return ICalendar::response(
 ```
 
 > All the modelling — events, recurrence, time zones, parsing — lives in the core package.
-> See the [core README](https://github.com/vanere/icalendar) for the full object model. This
+> See the [core README](https://github.com/erenav/icalendar) for the full object model. This
 > package is the thin Laravel glue on top.
 
 > 📖 **New here?** The [Recipes](docs/RECIPES.md) page has short, copy-paste examples for
@@ -36,7 +36,7 @@ return ICalendar::response(
 ## Installation
 
 ```bash
-composer require vanere/laravel-icalendar
+composer require erenav/laravel-icalendar
 ```
 
 The service provider and `ICalendar` facade are auto-discovered. Publish the config if you
@@ -60,7 +60,7 @@ return [
 ## The `ICalendar` facade
 
 ```php
-use Vanere\LaravelICalendar\Facades\ICalendar;
+use Erenav\LaravelICalendar\Facades\ICalendar;
 
 ICalendar::calendar();              // CalendarBuilder, pre-stamped with config PRODID
 ICalendar::event();                 // EventBuilder
@@ -78,9 +78,9 @@ clients) and a `toIcs()` helper. Carbon attributes flow straight into the date s
 
 ```php
 use Illuminate\Database\Eloquent\Model;
-use Vanere\ICalendar\Component\Event;
-use Vanere\LaravelICalendar\Concerns\InteractsWithCalendar;
-use Vanere\LaravelICalendar\Contracts\ProvidesCalendarEvent;
+use Erenav\ICalendar\Component\Event;
+use Erenav\LaravelICalendar\Concerns\InteractsWithCalendar;
+use Erenav\LaravelICalendar\Contracts\ProvidesCalendarEvent;
 
 class Meeting extends Model implements ProvidesCalendarEvent
 {
@@ -128,8 +128,8 @@ return response()->ics($calendar, 'meetings.ics');
 Mailables and notification mail messages:
 
 ```php
-use Vanere\LaravelICalendar\CalendarAttachment;
-use Vanere\LaravelICalendar\Facades\ICalendar;
+use Erenav\LaravelICalendar\CalendarAttachment;
+use Erenav\LaravelICalendar\Facades\ICalendar;
 
 public function toMail($notifiable): MailMessage
 {
@@ -157,7 +157,7 @@ php artisan icalendar:validate path/to/file.ics
 These come from the core. A quick taste:
 
 ```php
-use Vanere\ICalendar\Recurrence\{Recurrence, Weekday};
+use Erenav\ICalendar\Recurrence\{Recurrence, Weekday};
 
 $event = ICalendar::event()
     ->uid('standup@app.test')

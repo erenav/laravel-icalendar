@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar;
+namespace Erenav\LaravelICalendar;
 
+use Erenav\ICalendar\Component\Calendar;
+use Erenav\ICalendar\Component\Component;
 use Illuminate\Mail\Attachment;
-use Vanere\ICalendar\Component\Calendar;
-use Vanere\ICalendar\Component\Component;
 
 /**
  * Builds a mail {@see Attachment} from a calendar component, for use in

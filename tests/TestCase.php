@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar\Tests;
+namespace Erenav\LaravelICalendar\Tests;
 
+use Erenav\LaravelICalendar\Facades\ICalendar;
+use Erenav\LaravelICalendar\ICalendarServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Vanere\LaravelICalendar\Facades\ICalendar;
-use Vanere\LaravelICalendar\ICalendarServiceProvider;
 
 abstract class TestCase extends Orchestra
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Vanere\LaravelICalendar\Contracts;
+namespace Erenav\LaravelICalendar\Contracts;
 
-use Vanere\ICalendar\Component\Event;
+use Erenav\ICalendar\Component\Event;
 
 /**
  * Implemented by models (or any object) that can represent themselves as a

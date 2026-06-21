@@ -25,6 +25,9 @@ return ICalendar::response(
 > See the [core README](https://github.com/vanere/icalendar) for the full object model. This
 > package is the thin Laravel glue on top.
 
+> 📖 **New here?** The [Recipes](docs/RECIPES.md) page has short, copy-paste examples for
+> feeds, Eloquent mapping, mail attachments, and more.
+
 ## Requirements
 
 - PHP 8.3+

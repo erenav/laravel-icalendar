@@ -11,6 +11,10 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
 ### Added
 - Configurable persistence table names through `icalendar.persistence.tables`.
 
+### Breaking
+- Laravel 12 is now required. Laravel 11 has reached end of security support and is no
+  longer included in the supported dependency or CI matrix.
+
 ## [0.4.0] - 2026-08-17
 
 ### Added

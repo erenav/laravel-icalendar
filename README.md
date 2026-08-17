@@ -15,7 +15,7 @@ application's responsibility.
 
 ## Installation
 
-Requirements are PHP 8.3+ and Laravel 11 or 12.
+Requirements are PHP 8.3+ and Laravel 12.
 
 ```bash
 composer require erenav/laravel-icalendar

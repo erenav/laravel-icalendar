@@ -6,6 +6,43 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-17
+
+### Added
+- Optional application-managed persistence for calendars, VEVENT components, participants,
+  and alarms. Migrations are publish-only by default and
+  can be explicitly auto-loaded for persistence-enabled applications.
+- Detached recurrence overrides as self-linked event rows, with no rows for generated
+  occurrences; canonical ICS preservation alongside normalized identity, temporal,
+  revision, and participation fields.
+- Bidirectional core conversion, transactional ICS/core imports, structured import
+  results and previews, stored event/calendar export, core revision comparison, and stale
+  revision rejection.
+- Replaceable model registry, nullable optional ownership, persistence/configuration/model/
+  schema documentation, and a complete persistence ADR.
+
+### Changed
+- Core dependency is now `erenav/icalendar ^0.5.0`; Illuminate Database is an explicit
+  runtime dependency.
+- Package positioning expands from thin ICS glue to optional application-managed Laravel
+  persistence while retaining database-free response, attachment, parser,
+  serializer, validation, and application-model projection APIs.
+- Persistence now validates unambiguous UID/RECURRENCE-ID and revision metadata, matches
+  resolvable recurrence instances by instant, and keeps series links coherent after local
+  identity changes. Migrations honor the configured persistence
+  connection for both install and rollback.
+- Resolver-dependent custom-timezone identity projections now fall back to typed
+  lexical/semantic matching and refresh safely without duplicate rows.
+- The persistence scope is limited to application-managed calendars. Experimental calendar
+  connections, external mappings, credentials, provider adapters, synchronization cursors,
+  conflict policies, remote tombstones, and push/pull orchestration were removed before
+  release because external provider events belong to the host application.
+
+### Breaking
+- Persistence is a clean four-table initial schema with fixed `ical_` table names and no
+  legacy migration or compatibility layer. The discarded synchronization APIs have no
+  compatibility shims.
+
 ## [0.3.0] - 2026-06-20
 
 ### Changed
@@ -36,7 +73,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
 - `CalendarAttachment::for()` to attach a calendar to Mailables / notification mail messages.
 - `icalendar:validate` Artisan command.
 
-[Unreleased]: https://github.com/erenav/laravel-icalendar/compare/0.3.0...HEAD
+[Unreleased]: https://github.com/erenav/laravel-icalendar/compare/0.4.0...HEAD
+[0.4.0]: https://github.com/erenav/laravel-icalendar/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/erenav/laravel-icalendar/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/erenav/laravel-icalendar/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/erenav/laravel-icalendar/releases/tag/0.1.0

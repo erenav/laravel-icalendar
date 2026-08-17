@@ -20,6 +20,12 @@ final class AttachmentTest extends TestCase
         $this->assertInstanceOf(Attachment::class, $attachment);
         $this->assertSame('invite.ics', $attachment->as);
         $this->assertStringContainsString('text/calendar', (string) $attachment->mime);
+        $data = $attachment->attachWith(
+            static fn (): never => throw new \LogicException('Expected an in-memory attachment.'),
+            static fn ($resolver): string => $resolver(),
+        );
+        $this->assertStringContainsString('SUMMARY:Hi', $data);
+        $this->assertStringContainsString('BEGIN:VCALENDAR', $data);
     }
 
     public function test_itip_method_is_advertised_in_mime(): void

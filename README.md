@@ -1,188 +1,146 @@
 # erenav/laravel-icalendar
 
-[![Latest Version](https://img.shields.io/packagist/v/erenav/laravel-icalendar.svg)](https://packagist.org/packages/erenav/laravel-icalendar)
-[![Tests](https://github.com/erenav/laravel-icalendar/actions/workflows/ci.yml/badge.svg)](https://github.com/erenav/laravel-icalendar/actions/workflows/ci.yml)
-[![PHP Version](https://img.shields.io/packagist/php-v/erenav/laravel-icalendar.svg)](https://packagist.org/packages/erenav/laravel-icalendar)
-[![Total Downloads](https://img.shields.io/packagist/dt/erenav/laravel-icalendar.svg)](https://packagist.org/packages/erenav/laravel-icalendar)
-[![License](https://img.shields.io/packagist/l/erenav/laravel-icalendar.svg)](LICENSE)
+Laravel integration and optional application-managed calendar persistence for
+[`erenav/icalendar`](https://github.com/erenav/icalendar) 0.5.
 
-Laravel integration for [`erenav/icalendar`](https://github.com/erenav/icalendar) — build,
-serve, parse, and attach iCalendar (`.ics`) feeds from your Laravel app, with first-class
-Eloquent and Carbon support.
+The package has two independent modes:
 
-```php
-use Erenav\LaravelICalendar\Facades\ICalendar;
-use Erenav\ICalendar\Component\Event;
+- **ICS only:** build, parse, serialize, validate, serve, and attach calendars without a
+  database.
+- **Persistence enabled:** store an application's calendars, events, recurring series,
+  detached overrides, participants, and alarms, then convert them to and from core objects.
 
-return ICalendar::response(
-    ICalendar::calendar()
-        ->add(Event::build()->uid('1@app.test')->summary('Launch')->starts(now()))
-        ->get()
-); // → a downloadable text/calendar response
-```
-
-> All the modelling — events, recurrence, time zones, parsing — lives in the core package.
-> See the [core README](https://github.com/erenav/icalendar) for the full object model. This
-> package is the thin Laravel glue on top.
-
-> 📖 **New here?** The [Recipes](docs/RECIPES.md) page has short, copy-paste examples for
-> feeds, Eloquent mapping, mail attachments, and more.
-
-## Requirements
-
-- PHP 8.3+
-- Laravel 11 or 12
+External provider authentication, fetching, mappings, and synchronization remain the host
+application's responsibility.
 
 ## Installation
+
+Requirements are PHP 8.3+ and Laravel 11 or 12.
 
 ```bash
 composer require erenav/laravel-icalendar
 ```
 
-The service provider and `ICalendar` facade are auto-discovered. Publish the config if you
-want to tweak defaults:
+The service provider and `ICalendar` facade are auto-discovered. Installation does not load
+database migrations.
 
-```bash
-php artisan vendor:publish --tag=icalendar-config
-```
+## ICS-only use
 
 ```php
-// config/icalendar.php
-return [
-    'product_id'        => '-//' . env('APP_NAME', 'Laravel') . '//iCalendar//EN',
-    'strict'            => false, // strict parse + serialize
-    'include_timezones' => true,  // auto-inject VTIMEZONE on serialize
-    'filename'          => 'calendar.ics',
-    'uid_domain'        => null,  // defaults to APP_URL host
-];
-```
-
-## The `ICalendar` facade
-
-```php
+use Erenav\ICalendar\Component\Event;
 use Erenav\LaravelICalendar\Facades\ICalendar;
 
-ICalendar::calendar();              // CalendarBuilder, pre-stamped with config PRODID
-ICalendar::event();                 // EventBuilder
-ICalendar::serialize($component);   // string (.ics); auto-includes VTIMEZONE per config
-ICalendar::parse($icsString);       // Calendar  (lenient, or strict per config)
-ICalendar::fromModels($models);     // Calendar from a collection of mappable models
-ICalendar::response($calendar);     // a downloadable CalendarResponse
+$calendar = ICalendar::calendar()
+    ->add(Event::build()->uid('launch@app.test')->summary('Launch')->starts(now()))
+    ->get();
+
+$parsed = ICalendar::parse(ICalendar::serialize($calendar));
+
+return ICalendar::response($parsed, 'calendar.ics');
 ```
 
-## Mapping Eloquent models
+`CalendarAttachment::for($calendar, 'invite.ics')` creates a mail attachment,
+`response()->ics($calendar)` creates a download, and
+`php artisan icalendar:validate file.ics` performs a strict parse. A calendar with an iTIP
+`METHOD` includes it in the attachment MIME type.
 
-Implement `ProvidesCalendarEvent` and use the `InteractsWithCalendar` trait. The trait gives
-you a stable, deterministic UID (so re-exporting a record never duplicates it in calendar
-clients) and a `toIcs()` helper. Carbon attributes flow straight into the date setters.
+## Enabling persistence
+
+```bash
+php artisan vendor:publish --tag=icalendar-migrations
+php artisan migrate
+```
+
+Then enable it in `config/icalendar.php`:
 
 ```php
-use Illuminate\Database\Eloquent\Model;
-use Erenav\ICalendar\Component\Event;
-use Erenav\LaravelICalendar\Concerns\InteractsWithCalendar;
-use Erenav\LaravelICalendar\Contracts\ProvidesCalendarEvent;
+'persistence' => [
+    'enabled' => true,
+    'load_migrations' => false,
+    // ...
+],
+```
 
+Setting both options to true auto-loads the package migration. This is opt-in; ICS-only
+applications never need package tables.
+
+## Local calendars and events
+
+```php
+use Erenav\LaravelICalendar\Importing\CalendarImporter;
+use Erenav\LaravelICalendar\Persistence\CalendarStore;
+use Erenav\LaravelICalendar\Persistence\StoredCalendarExporter;
+
+$stored = app(CalendarStore::class)->create('Team calendar');
+
+$result = app(CalendarImporter::class)->importIcs($stored, $uploadedIcs);
+$result->counts(); // created, updated, unchanged, skipped, invalid
+
+$calendarIcs = app(StoredCalendarExporter::class)->calendarIcs($stored);
+$eventIcs = app(StoredCalendarExporter::class)->eventIcs($storedEvent);
+```
+
+`CalendarStore::createFromCore()` transactionally persists a core `Calendar`.
+`putEvent()` creates or replaces one application-managed event, `replaceEvent()` updates an
+existing row, and `upsertRecurringSeries()` stores a master with explicit detached
+overrides. Generated occurrences are never stored.
+
+`CalendarImporter::importCalendar()` accepts a core calendar. Preview methods select
+duplicate revisions without writing. Imports are calendar-scoped and match by UID plus
+RECURRENCE-ID; the core revision comparator rejects stale input. An import containing an
+invalid VEVENT reports the failures and performs no writes.
+
+The four replaceable models are:
+
+- `Models\Calendar`
+- `Models\CalendarEvent`
+- `Models\EventParticipant`
+- `Models\EventAlarm`
+
+Canonical VCALENDAR, VEVENT, participant, and VALARM ICS preserves recurrence properties,
+unknown RRULE parts, DATE/floating/UTC/TZID forms, embedded timezones, organizer/attendee
+parameters, alarms, unknown properties, and unknown components. Normalized columns support
+identity and common queries without becoming the RFC source of truth.
+
+After loading a stored calendar as a core object, bounded recurrence expansion remains a
+core operation:
+
+```php
+$core = app(StoredCalendarExporter::class)->calendar($stored);
+$occurrences = $core->occurrencesBetween($from, $to);
+```
+
+## Mapping application models
+
+`ProvidesCalendarEvent` and `InteractsWithCalendar` remain lightweight ICS projections for
+an application's own models; they are independent of package persistence.
+
+```php
 class Meeting extends Model implements ProvidesCalendarEvent
 {
     use InteractsWithCalendar;
 
-    protected $casts = ['starts_at' => 'datetime', 'ends_at' => 'datetime'];
-
     public function toCalendarEvent(): Event
     {
         return Event::build()
-            ->uid($this->calendarUid())          // e.g. "Meeting-42@app.test"
+            ->uid($this->calendarUid())
             ->summary($this->title)
-            ->starts($this->starts_at)            // Carbon → DateTimeInterface
-            ->ends($this->ends_at)
+            ->starts($this->starts_at)
             ->get();
     }
 }
 ```
 
-```php
-$meeting->toIcs();                                   // single-event .ics string
-ICalendar::fromModels(Meeting::today()->get());      // Calendar of many
-```
+## Documentation
 
-## Serving a feed
+- [Recipes](docs/RECIPES.md)
+- [Configuration](docs/CONFIGURATION.md)
+- [Persistence ADR](docs/PERSISTENCE.md)
+- [Model extension](docs/MODELS.md)
+- [Initial schema](docs/SCHEMA.md)
+- [Service provider](docs/SERVICE_PROVIDER.md)
 
-`ICalendar::response()` (and the `response()->ics()` macro) return a `Responsable`
-`text/calendar` download:
-
-```php
-Route::get('/calendar.ics', function () {
-    return ICalendar::response(
-        ICalendar::fromModels(Meeting::upcoming()->get()),
-        'meetings.ics',
-    );
-});
-
-// or via the macro:
-return response()->ics($calendar, 'meetings.ics');
-```
-
-## Attaching to mail & notifications
-
-`CalendarAttachment::for()` produces a standard Laravel mail `Attachment`, usable from
-Mailables and notification mail messages:
-
-```php
-use Erenav\LaravelICalendar\CalendarAttachment;
-use Erenav\LaravelICalendar\Facades\ICalendar;
-
-public function toMail($notifiable): MailMessage
-{
-    $calendar = ICalendar::calendar()
-        ->add($this->meeting->toCalendarEvent())
-        ->get();
-
-    return (new MailMessage)
-        ->subject('Your meeting')
-        ->line('See the attached invite.')
-        ->attach(CalendarAttachment::for($calendar, 'invite.ics'));
-}
-```
-
-## Artisan
-
-```bash
-php artisan icalendar:validate path/to/file.ics
-# → "Valid iCalendar — 3 event(s), 4 component(s)."  (exit 0)
-# → "Invalid iCalendar: …"                            (exit 1)
-```
-
-## Recurrence & time zones
-
-These come from the core. A quick taste:
-
-```php
-use Erenav\ICalendar\Recurrence\{Recurrence, Weekday};
-
-$event = ICalendar::event()
-    ->uid('standup@app.test')
-    ->starts(now())
-    ->recurrence(Recurrence::weekly()->on(Weekday::Monday, Weekday::Wednesday))
-    ->get();
-
-// Override-aware expansion across a calendar:
-foreach ($calendar->occurrencesBetween(now(), now()->addMonth()) as $occurrence) {
-    $occurrence->start;  // Carbon-compatible DateTimeImmutable
-    $occurrence->event;  // the effective event for this instance
-}
-```
-
-`ICalendar::serialize()` auto-injects `VTIMEZONE` definitions for the IANA zones your events
-use (toggle with `config('icalendar.include_timezones')`), so feeds are self-contained.
-
-## Testing
-
-```bash
-composer install
-vendor/bin/phpunit
-```
-
-Tests run against a real Laravel app via [Orchestra Testbench](https://github.com/orchestral/testbench).
+Run all supported checks with `composer check`.
 
 ## License
 

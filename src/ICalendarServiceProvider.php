@@ -33,7 +33,16 @@ final class ICalendarServiceProvider extends ServiceProvider
                 __DIR__.'/../config/icalendar.php' => $this->app->configPath('icalendar.php'),
             ], 'icalendar-config');
 
+            $this->publishes([
+                __DIR__.'/../database/migrations/2026_08_15_000000_create_icalendar_persistence_tables.php' => $this->app->databasePath('migrations/2026_08_15_000000_create_icalendar_persistence_tables.php'),
+            ], 'icalendar-migrations');
+
             $this->commands([ValidateCommand::class]);
+        }
+
+        if ((bool) config('icalendar.persistence.enabled', false)
+            && (bool) config('icalendar.persistence.load_migrations', false)) {
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         }
 
         $this->registerResponseMacro();

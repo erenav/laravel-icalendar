@@ -1,126 +1,95 @@
-# Recipes (Laravel)
+# Recipes
 
-Copy-paste examples for common Laravel tasks. Everything goes through the `ICalendar`
-facade or the small set of helper classes. For the calendar/event modelling itself, see
-the [core recipes](https://github.com/erenav/icalendar/blob/main/docs/RECIPES.md).
+## Serve or attach ICS without persistence
 
 ```php
-use Erenav\LaravelICalendar\Facades\ICalendar;
-use Erenav\ICalendar\Component\Event;
+$calendar = ICalendar::calendar()->add($event)->get();
+
+return ICalendar::response($calendar, 'events.ics');
+// return response()->ics($calendar, 'events.ics');
+// CalendarAttachment::for($calendar, 'invite.ics');
 ```
 
----
-
-## Serve a calendar feed from a route
+For an iTIP message, set the calendar method before attaching it:
 
 ```php
-Route::get('/calendar.ics', function () {
-    $calendar = ICalendar::calendar()
-        ->add(Event::build()->uid('1@app.test')->summary('Launch')->starts(now()))
-        ->get();
-
-    return ICalendar::response($calendar, 'events.ics');   // downloadable text/calendar
-});
+$request = ICalendar::calendar()->method('REQUEST')->add($event)->get();
+$attachment = CalendarAttachment::for($request, 'invite.ics');
 ```
 
-Or with the response macro:
+## Import an uploaded calendar
 
 ```php
-return response()->ics($calendar, 'events.ics');
-```
-
-## Turn an Eloquent model into an event
-
-```php
-use Illuminate\Database\Eloquent\Model;
-use Erenav\ICalendar\Component\Event;
-use Erenav\LaravelICalendar\Concerns\InteractsWithCalendar;
-use Erenav\LaravelICalendar\Contracts\ProvidesCalendarEvent;
-
-class Meeting extends Model implements ProvidesCalendarEvent
-{
-    use InteractsWithCalendar;
-
-    protected $casts = ['starts_at' => 'datetime', 'ends_at' => 'datetime'];
-
-    public function toCalendarEvent(): Event
-    {
-        return Event::build()
-            ->uid($this->calendarUid())     // stable id, e.g. "Meeting-42@app.test"
-            ->summary($this->title)
-            ->starts($this->starts_at)       // Carbon works directly
-            ->ends($this->ends_at)
-            ->get();
-    }
-}
-```
-
-## Serve many models as a feed
-
-```php
-Route::get('/meetings.ics', fn () => ICalendar::response(
-    ICalendar::fromModels(Meeting::upcoming()->get())
-));
-```
-
-## One model as a downloadable file
-
-```php
-return ICalendar::response(
-    ICalendar::calendar()->add($meeting->toCalendarEvent())->get(),
-    'meeting.ics',
+$calendar = app(CalendarStore::class)->create('Imports');
+$result = app(CalendarImporter::class)->importIcs(
+    $calendar,
+    $request->file('calendar')->get(),
 );
 
-// or just the string:
-$ics = $meeting->toIcs();
-```
-
-## Attach an invite to a notification
-
-```php
-use Erenav\LaravelICalendar\CalendarAttachment;
-use Erenav\LaravelICalendar\Facades\ICalendar;
-
-public function toMail($notifiable): MailMessage
-{
-    $calendar = ICalendar::calendar()->add($this->meeting->toCalendarEvent())->get();
-
-    return (new MailMessage)
-        ->subject('Your meeting')
-        ->line('See the attached invite.')
-        ->attach(CalendarAttachment::for($calendar, 'invite.ics'));
+if ($result->invalid !== []) {
+    // Present invalid components to the application. Nothing was persisted.
 }
 ```
 
-## Parse an uploaded `.ics`
+Preview parsing and duplicate revision selection without writes:
 
 ```php
-$calendar = ICalendar::parse($request->file('ics')->get());
-
-foreach ($calendar->events() as $event) {
-    // $event->summary(), $event->start(), $event->attendees(), ...
-}
+$preview = app(CalendarImporter::class)->previewIcs($ics);
+$preview->selectedEvents;
+$preview->discardedRevisions;
+$preview->discardedRevisionIds;
+$preview->invalid;
 ```
 
-## Validate an `.ics` file from the CLI
-
-```bash
-php artisan icalendar:validate storage/app/feed.ics
-```
-
-## Configure defaults
-
-```bash
-php artisan vendor:publish --tag=icalendar-config
-```
+## Create an internal event
 
 ```php
-// config/icalendar.php
-return [
-    'product_id'        => '-//'.env('APP_NAME', 'Laravel').'//iCalendar//EN',
-    'strict'            => false, // throw on invalid input/output
-    'include_timezones' => true,  // auto-add VTIMEZONE on serialize
-    'filename'          => 'calendar.ics',
-    'uid_domain'        => null,  // defaults to APP_URL host
-];
+$calendar = app(CalendarStore::class)->create('Internal calendar');
+
+$record = app(CalendarStore::class)->putEvent(
+    $calendar,
+    Event::build()
+        ->uid('meeting@app.test')
+        ->starts(DateTimeValue::zoned($wallTime, 'America/New_York'))
+        ->lasting(Duration::hours(1))
+        ->summary('Planning')
+        ->get(),
+);
 ```
+
+For recurring data, store the RRULE master and only explicit detached VEVENT overrides:
+
+```php
+$records = app(CalendarStore::class)->upsertRecurringSeries(
+    $calendar,
+    $master,
+    $overrides,
+);
+```
+
+Generated occurrences remain transient. Expand through a bounded core window:
+
+```php
+$core = app(StoredCalendarExporter::class)->calendar($calendar);
+$occurrences = $core->occurrencesBetween($from, $to);
+```
+
+## Export stored data
+
+```php
+$exporter = app(StoredCalendarExporter::class);
+
+$calendarIcs = $exporter->calendarIcs($calendarRecord);
+$singleEventCalendarIcs = $exporter->eventIcs($eventRecord);
+$eventComponentIcs = $exporter->eventComponentIcs($eventRecord);
+```
+
+## Use optional ownership
+
+```php
+// config: icalendar.persistence.owner.enabled = true
+app(CalendarStore::class)->assignOwner($calendar, 'account', (string) $accountId);
+```
+
+The type/ID may represent an Eloquent morph target or another stable application
+principal. Authorization remains application-owned.

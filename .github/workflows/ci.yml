@@ -45,3 +45,72 @@ jobs:
 
       - name: Run tests
         run: vendor/bin/phpunit
+
+  database-migrations:
+    name: ${{ matrix.database }} migration and rollback
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - database: MySQL 8.4
+            driver: mysql
+            port: 3306
+          - database: PostgreSQL 17
+            driver: pgsql
+            port: 5432
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: audit-root
+          MYSQL_DATABASE: icalendar_audit
+          MYSQL_USER: icalendar_audit
+          MYSQL_PASSWORD: icalendar_audit
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uicalendar_audit -picalendar_audit"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: icalendar_audit
+          POSTGRES_USER: icalendar_audit
+          POSTGRES_PASSWORD: icalendar_audit
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U icalendar_audit -d icalendar_audit"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          extensions: pdo_mysql, pdo_pgsql
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Run live migration and rollback test
+        run: vendor/bin/phpunit --filter MigrationTest
+        env:
+          ICALENDAR_TEST_DB_DRIVER: ${{ matrix.driver }}
+          ICALENDAR_TEST_DB_HOST: 127.0.0.1
+          ICALENDAR_TEST_DB_PORT: ${{ matrix.port }}
+          ICALENDAR_TEST_DB_DATABASE: icalendar_audit
+          ICALENDAR_TEST_DB_USERNAME: icalendar_audit
+          ICALENDAR_TEST_DB_PASSWORD: icalendar_audit

@@ -1,6 +1,10 @@
 <?php
 
 declare(strict_types=1);
+use Erenav\LaravelICalendar\Models\Calendar;
+use Erenav\LaravelICalendar\Models\CalendarEvent;
+use Erenav\LaravelICalendar\Models\EventAlarm;
+use Erenav\LaravelICalendar\Models\EventParticipant;
 
 return [
 
@@ -47,5 +51,30 @@ return [
     | Defaults to the host of APP_URL when null.
     */
     'uid_domain' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Optional persistence
+    |--------------------------------------------------------------------------
+    | Persistence and migration loading are separate, explicit choices. An
+    | application using only ICS features never touches the database.
+    */
+    'persistence' => [
+        'enabled' => false,
+        'load_migrations' => false,
+        'connection' => null,
+
+        'models' => [
+            'calendar' => Calendar::class,
+            'event' => CalendarEvent::class,
+            'participant' => EventParticipant::class,
+            'alarm' => EventAlarm::class,
+        ],
+
+        'owner' => [
+            'enabled' => false,
+        ],
+
+    ],
 
 ];

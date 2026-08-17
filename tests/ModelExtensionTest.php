@@ -8,6 +8,9 @@ use Erenav\ICalendar\Component\Alarm;
 use Erenav\ICalendar\Component\Event;
 use Erenav\ICalendar\Property\AlarmAction;
 use Erenav\ICalendar\ValueType\Duration;
+use Erenav\LaravelICalendar\Enums\CalendarSourceType;
+use Erenav\LaravelICalendar\Enums\EventComponentType;
+use Erenav\LaravelICalendar\Enums\TemporalType;
 use Erenav\LaravelICalendar\Models\Calendar;
 use Erenav\LaravelICalendar\Models\CalendarEvent;
 use Erenav\LaravelICalendar\Models\EventAlarm;
@@ -25,6 +28,66 @@ final class ReplacementCalendarEvent extends CalendarEvent {}
 final class ReplacementEventParticipant extends EventParticipant {}
 
 final class ReplacementEventAlarm extends EventAlarm {}
+
+trait AssignsIntegerKey
+{
+    private static int $nextKey = 1;
+
+    protected static function booted(): void
+    {
+        static::creating(static function (Model $model): void {
+            if ($model->getKey() === null) {
+                $model->setAttribute($model->getKeyName(), self::$nextKey++);
+            }
+        });
+    }
+}
+
+final class IndependentCalendar extends Model
+{
+    use AssignsIntegerKey;
+
+    protected $table = 'ical_calendars';
+
+    public $incrementing = false;
+
+    protected $keyType = 'int';
+
+    protected function casts(): array
+    {
+        return [
+            'source_type' => CalendarSourceType::class,
+            'enabled' => 'boolean',
+        ];
+    }
+}
+
+final class IndependentCalendarEvent extends Model
+{
+    use AssignsIntegerKey;
+
+    protected $table = 'ical_calendar_events';
+
+    public $incrementing = false;
+
+    protected $keyType = 'int';
+
+    protected function casts(): array
+    {
+        return [
+            'component_type' => EventComponentType::class,
+            'recurrence_id_type' => TemporalType::class,
+            'dtstart_type' => TemporalType::class,
+            'dtend_type' => TemporalType::class,
+            'dtstart_utc' => 'immutable_datetime',
+            'dtend_utc' => 'immutable_datetime',
+            'ical_created_at' => 'immutable_datetime',
+            'ical_dtstamp' => 'immutable_datetime',
+            'ical_last_modified_at' => 'immutable_datetime',
+            'is_cancelled' => 'boolean',
+        ];
+    }
+}
 
 final class CalendarOwnerPrincipal extends Model
 {
@@ -103,5 +166,26 @@ final class ModelExtensionTest extends PersistenceTestCase
         $freshCalendar = ReplacementCalendar::query()->whereKey($calendar->getKey())->firstOrFail();
         $exported = app(StoredCalendarExporter::class)->calendar($freshCalendar);
         $this->assertSame('all-replacements', $exported->events()[0]->uid());
+    }
+
+    public function test_independent_models_can_use_non_uuid_keys_without_extending_package_models(): void
+    {
+        config()->set('icalendar.persistence.models.calendar', IndependentCalendar::class);
+        config()->set('icalendar.persistence.models.event', IndependentCalendarEvent::class);
+
+        $calendar = app(CalendarStore::class)->create('Integer keys');
+        $event = app(CalendarStore::class)->putEvent(
+            $calendar,
+            Event::build()->uid('integer-key-event')->summary('Independent')->get(),
+        );
+
+        $this->assertIsInt($calendar->getKey());
+        $this->assertIsInt($event->getKey());
+        $this->assertNotInstanceOf(Calendar::class, $calendar);
+        $this->assertNotInstanceOf(CalendarEvent::class, $event);
+        $this->assertSame(
+            'integer-key-event',
+            app(StoredCalendarExporter::class)->calendar($calendar)->events()[0]->uid(),
+        );
     }
 }

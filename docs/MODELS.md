@@ -4,7 +4,7 @@ The `Calendar`, `CalendarEvent`, `EventParticipant`, and `EventAlarm` models can
 under `icalendar.persistence.models`. Relationships and services resolve the configured
 classes at call time.
 
-The safest replacement extends the package model:
+The simplest replacement extends the package model:
 
 ```php
 final class ApplicationCalendarEvent extends CalendarEvent
@@ -13,12 +13,16 @@ final class ApplicationCalendarEvent extends CalendarEvent
 }
 ```
 
-A replacement that does not extend the supplied model must preserve its `ical_` table,
-UUID behavior, casts, configured persistence connection, identifiers, and relationships.
-Services assign attributes explicitly and do not depend on mass assignment.
+A replacement may instead extend Eloquent's base `Model` directly. Package services assign
+attributes explicitly, accept scalar or stringable primary keys, and do not require
+`HasUuids`, package-model inheritance, mass assignment, or relationships. Independent
+models must provide compatible columns and casts, and their primary and foreign-key column
+types must agree. Publish and customize the migration when using bigint, ULID, or another
+key strategy.
 
-Table names are fixed. The prefix avoids common application table names and keeps published
-foreign keys portable.
+The supplied models and migration use UUID keys and configurable `ical_` table names by
+default. UUID remains the supported turnkey schema; custom key strategies are an advanced
+model-and-migration customization rather than a runtime configuration switch.
 
 Calendar ownership is nullable and disabled by default. Enabling it permits storing a
 stable `owner_type`/`owner_id` pair without imposing a User model or authorization policy.

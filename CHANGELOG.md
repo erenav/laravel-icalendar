@@ -10,6 +10,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
 
 ### Added
 - Configurable persistence table names through `icalendar.persistence.tables`.
+- Independent replacement models may use scalar or stringable non-UUID keys when paired
+  with a compatible application migration.
 
 ### Breaking
 - Laravel 12 is now required. Laravel 11 has reached end of security support and is no

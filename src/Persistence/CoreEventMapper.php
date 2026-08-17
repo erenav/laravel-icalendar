@@ -31,7 +31,7 @@ final class CoreEventMapper
 
     public function fill(
         Model $record,
-        string $calendarId,
+        int|string $calendarId,
         Event $event,
         ?TimeZoneResolver $timeZones = null,
     ): void {

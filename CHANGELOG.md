@@ -6,12 +6,24 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-08-17
+
+### Fixed
+- Integer model identifiers now remain integers across event replacement, mapping,
+  imports, recurrence linking, child foreign keys, and import results.
+- Independent-model coverage now uses native auto-increment keys and matching foreign keys
+  and runs against SQLite, MySQL, and PostgreSQL in CI.
+
+## [0.5.1] - 2026-08-17
+
+### Added
+- Independent replacement models may use scalar or stringable non-UUID keys when paired
+  with a compatible application migration.
+
 ## [0.5.0] - 2026-08-17
 
 ### Added
 - Configurable persistence table names through `icalendar.persistence.tables`.
-- Independent replacement models may use scalar or stringable non-UUID keys when paired
-  with a compatible application migration.
 
 ### Breaking
 - Laravel 12 is now required. Laravel 11 has reached end of security support and is no
@@ -84,7 +96,9 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
 - `CalendarAttachment::for()` to attach a calendar to Mailables / notification mail messages.
 - `icalendar:validate` Artisan command.
 
-[Unreleased]: https://github.com/erenav/laravel-icalendar/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/erenav/laravel-icalendar/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/erenav/laravel-icalendar/compare/v0.5.1...v0.5.2
+[0.5.1]: https://github.com/erenav/laravel-icalendar/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/erenav/laravel-icalendar/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/erenav/laravel-icalendar/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/erenav/laravel-icalendar/compare/0.2.0...0.3.0

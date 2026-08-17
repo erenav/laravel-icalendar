@@ -6,16 +6,16 @@ namespace Erenav\LaravelICalendar\Importing;
 
 final class ImportResult
 {
-    /** @var list<string> */
+    /** @var list<int|string> */
     public array $created = [];
 
-    /** @var list<string> */
+    /** @var list<int|string> */
     public array $updated = [];
 
-    /** @var list<string> */
+    /** @var list<int|string> */
     public array $unchanged = [];
 
-    /** @var list<string> */
+    /** @var list<int|string> Record identifiers and discarded revision identities. */
     public array $skipped = [];
 
     /** @var list<string> */

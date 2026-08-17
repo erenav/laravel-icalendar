@@ -163,7 +163,7 @@ final class CalendarImporter
         foreach ($events as $event) {
             $core = $this->events->toCore($event);
             $masterId = $core->recurrenceId() === null ? null : ($masters[$core->uid() ?? ''] ?? null);
-            if ($event->getAttribute('recurring_master_id') !== $masterId) {
+            if (! ModelValue::sameIdentifier($event->getAttribute('recurring_master_id'), $masterId)) {
                 $event->setAttribute('recurring_master_id', $masterId);
                 $event->save();
             }

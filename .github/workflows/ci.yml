@@ -105,8 +105,8 @@ jobs:
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction --no-progress
 
-      - name: Run live migration and rollback test
-        run: vendor/bin/phpunit --filter MigrationTest
+      - name: Run live persistence schema tests
+        run: vendor/bin/phpunit --filter 'MigrationTest|IndependentModelKeyTest'
         env:
           ICALENDAR_TEST_DB_DRIVER: ${{ matrix.driver }}
           ICALENDAR_TEST_DB_HOST: 127.0.0.1

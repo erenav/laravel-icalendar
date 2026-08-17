@@ -17,8 +17,9 @@ A replacement may instead extend Eloquent's base `Model` directly. Package servi
 attributes explicitly, accept scalar or stringable primary keys, and do not require
 `HasUuids`, package-model inheritance, mass assignment, or relationships. Independent
 models must provide compatible columns and casts, and their primary and foreign-key column
-types must agree. Publish and customize the migration when using bigint, ULID, or another
-key strategy.
+types must agree. They must also use the configured persistence connection, either with
+`UsesPersistenceConnection` or their own `getConnectionName()` implementation. Publish and
+customize the migration when using bigint, ULID, or another key strategy.
 
 The supplied models and migration use UUID keys and configurable `ical_` table names by
 default. UUID remains the supported turnkey schema; custom key strategies are an advanced

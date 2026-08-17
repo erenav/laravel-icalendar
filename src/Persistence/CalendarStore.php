@@ -144,12 +144,12 @@ final class CalendarStore
     public function replaceEvent(
         Model $record,
         Event $event,
-        ?string $calendarId = null,
+        int|string|null $calendarId = null,
     ): Model {
         $this->guard->ensureEnabled();
         EventIdentity::assertValid($event);
         $this->revisions->compare($event, $event);
-        $calendarId ??= ModelValue::string($record, 'calendar_id');
+        $calendarId ??= ModelValue::foreignKey($record, 'calendar_id');
         $calendarClass = ModelRegistry::calendar();
         $calendar = $calendarClass::query()->whereKey($calendarId)->firstOrFail();
         $timeZones = $this->timeZones($calendar);

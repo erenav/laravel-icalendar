@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Erenav\LaravelICalendar\Support\TableRegistry;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         $schema = Schema::connection(config('icalendar.persistence.connection'));
+        $calendars = TableRegistry::calendar();
+        $events = TableRegistry::event();
+        $participants = TableRegistry::participant();
+        $alarms = TableRegistry::alarm();
 
-        $schema->create('ical_calendars', function (Blueprint $table): void {
+        $schema->create($calendars, function (Blueprint $table): void {
             $table->uuid('id');
             $table->primary('id');
             $table->string('name');
@@ -29,7 +34,7 @@ return new class extends Migration
             $table->index(['owner_type', 'owner_id'], 'ical_cal_owner_idx');
         });
 
-        $schema->create('ical_calendar_events', function (Blueprint $table): void {
+        $schema->create($events, function (Blueprint $table) use ($calendars, $events): void {
             $table->uuid('id');
             $table->primary('id');
             $table->uuid('calendar_id');
@@ -70,13 +75,13 @@ return new class extends Migration
             $table->longText('component_ics');
             $table->timestamps();
 
-            $table->foreign('calendar_id')->references('id')->on('ical_calendars')->cascadeOnDelete();
-            $table->foreign('recurring_master_id')->references('id')->on('ical_calendar_events')->nullOnDelete();
+            $table->foreign('calendar_id')->references('id')->on($calendars)->cascadeOnDelete();
+            $table->foreign('recurring_master_id')->references('id')->on($events)->nullOnDelete();
             $table->unique(['calendar_id', 'identity_hash'], 'ical_event_identity_uq');
             $table->index(['recurring_master_id', 'recurrence_id_value'], 'ical_event_master_rid_idx');
         });
 
-        $schema->create('ical_event_participants', function (Blueprint $table): void {
+        $schema->create($participants, function (Blueprint $table) use ($events): void {
             $table->uuid('id');
             $table->primary('id');
             $table->uuid('event_id');
@@ -98,11 +103,11 @@ return new class extends Migration
             $table->text('property_ics');
             $table->timestamps();
 
-            $table->foreign('event_id')->references('id')->on('ical_calendar_events')->cascadeOnDelete();
+            $table->foreign('event_id')->references('id')->on($events)->cascadeOnDelete();
             $table->unique(['event_id', 'position'], 'ical_participant_position_uq');
         });
 
-        $schema->create('ical_event_alarms', function (Blueprint $table): void {
+        $schema->create($alarms, function (Blueprint $table) use ($events): void {
             $table->uuid('id');
             $table->primary('id');
             $table->uuid('event_id');
@@ -117,7 +122,7 @@ return new class extends Migration
             $table->text('component_ics');
             $table->timestamps();
 
-            $table->foreign('event_id')->references('id')->on('ical_calendar_events')->cascadeOnDelete();
+            $table->foreign('event_id')->references('id')->on($events)->cascadeOnDelete();
             $table->unique(['event_id', 'position'], 'ical_alarm_position_uq');
         });
     }
@@ -126,9 +131,9 @@ return new class extends Migration
     {
         $schema = Schema::connection(config('icalendar.persistence.connection'));
 
-        $schema->dropIfExists('ical_event_alarms');
-        $schema->dropIfExists('ical_event_participants');
-        $schema->dropIfExists('ical_calendar_events');
-        $schema->dropIfExists('ical_calendars');
+        $schema->dropIfExists(TableRegistry::alarm());
+        $schema->dropIfExists(TableRegistry::participant());
+        $schema->dropIfExists(TableRegistry::event());
+        $schema->dropIfExists(TableRegistry::calendar());
     }
 };

@@ -7,6 +7,7 @@ namespace Erenav\LaravelICalendar\Models;
 use Erenav\LaravelICalendar\Enums\CalendarSourceType;
 use Erenav\LaravelICalendar\Models\Concerns\UsesPersistenceConnection;
 use Erenav\LaravelICalendar\Support\ModelRegistry;
+use Erenav\LaravelICalendar\Support\TableRegistry;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,6 +19,13 @@ class Calendar extends Model
     use UsesPersistenceConnection;
 
     protected $table = 'ical_calendars';
+
+    public function getTable(): string
+    {
+        $configured = TableRegistry::calendar();
+
+        return $configured === 'ical_calendars' ? parent::getTable() : $configured;
+    }
 
     /** @return array<string, string> */
     protected function casts(): array

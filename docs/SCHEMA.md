@@ -1,7 +1,8 @@
 # Initial persistence schema
 
 All primary and foreign keys are UUID strings. Every table has `created_at` and
-`updated_at`.
+`updated_at`. The names below are defaults and can be changed with
+`icalendar.persistence.tables` before running the initial migration.
 
 ## `ical_calendars`
 

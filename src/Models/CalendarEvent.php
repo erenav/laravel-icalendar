@@ -8,6 +8,7 @@ use Erenav\LaravelICalendar\Enums\EventComponentType;
 use Erenav\LaravelICalendar\Enums\TemporalType;
 use Erenav\LaravelICalendar\Models\Concerns\UsesPersistenceConnection;
 use Erenav\LaravelICalendar\Support\ModelRegistry;
+use Erenav\LaravelICalendar\Support\TableRegistry;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,13 @@ class CalendarEvent extends Model
     use UsesPersistenceConnection;
 
     protected $table = 'ical_calendar_events';
+
+    public function getTable(): string
+    {
+        $configured = TableRegistry::event();
+
+        return $configured === 'ical_calendar_events' ? parent::getTable() : $configured;
+    }
 
     /** @return array<string, string> */
     protected function casts(): array

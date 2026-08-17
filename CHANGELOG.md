@@ -6,6 +6,11 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-17
+
+### Added
+- Configurable persistence table names through `icalendar.persistence.tables`.
+
 ## [0.4.0] - 2026-08-17
 
 ### Added
@@ -73,7 +78,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
 - `CalendarAttachment::for()` to attach a calendar to Mailables / notification mail messages.
 - `icalendar:validate` Artisan command.
 
-[Unreleased]: https://github.com/erenav/laravel-icalendar/compare/0.4.0...HEAD
+[Unreleased]: https://github.com/erenav/laravel-icalendar/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/erenav/laravel-icalendar/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/erenav/laravel-icalendar/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/erenav/laravel-icalendar/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/erenav/laravel-icalendar/compare/0.1.0...0.2.0

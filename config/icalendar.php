@@ -64,6 +64,13 @@ return [
         'load_migrations' => false,
         'connection' => null,
 
+        'tables' => [
+            'calendar' => 'ical_calendars',
+            'event' => 'ical_calendar_events',
+            'participant' => 'ical_event_participants',
+            'alarm' => 'ical_event_alarms',
+        ],
+
         'models' => [
             'calendar' => Calendar::class,
             'event' => CalendarEvent::class,

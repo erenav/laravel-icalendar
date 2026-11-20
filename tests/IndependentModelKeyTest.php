@@ -127,7 +127,7 @@ final class IndependentModelKeyTest extends PersistenceTestCase
         if (DB::getDriverName() !== 'sqlite') {
             $columnType = Schema::connection(config('icalendar.persistence.connection'))
                 ->getColumnType('bigint_calendar_events', 'calendar_id');
-            $this->assertStringContainsString('bigint', strtolower($columnType));
+            $this->assertContains(strtolower($columnType), ['bigint', 'int8']);
         }
 
         $calendar = app(CalendarStore::class)->create('Integer keys');

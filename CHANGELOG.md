@@ -6,6 +6,13 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adh
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-11-20
+
+### Fixed
+- Moving a recurring master to another calendar with `replaceEvent()` now moves its
+  detached overrides with it and relinks them, instead of leaving them unlinked in the
+  original calendar. A master moved under a new UID still leaves the old overrides in place.
+
 ## [0.5.2] - 2026-08-17
 
 ### Fixed

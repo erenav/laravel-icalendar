@@ -17,6 +17,7 @@ use Erenav\LaravelICalendar\Models\CalendarEvent;
 use Erenav\LaravelICalendar\Models\EventAlarm;
 use Erenav\LaravelICalendar\Models\EventParticipant;
 use Erenav\LaravelICalendar\Persistence\CalendarStore;
+use Erenav\LaravelICalendar\Persistence\StoredCalendarExporter;
 
 final class InternalCalendarTest extends PersistenceTestCase
 {
@@ -81,6 +82,53 @@ ICS);
         $this->assertNull($master->refresh()->getAttribute('recurring_master_id'));
         $this->assertNull($override->refresh()->getAttribute('recurring_master_id'));
         $this->assertSame(EventComponentType::Standalone, $master->getAttribute('component_type'));
+    }
+
+    public function test_moving_a_series_master_to_another_calendar_moves_its_overrides(): void
+    {
+        $start = DateTimeValue::utc(new \DateTimeImmutable('2026-08-15 09:00:00 UTC'));
+        $slot = DateTimeValue::utc(new \DateTimeImmutable('2026-08-16 09:00:00 UTC'));
+        $from = app(CalendarStore::class)->create('From');
+        $to = app(CalendarStore::class)->create('To');
+        $master = Event::build()->uid('moving-series')->starts($start)->recurrence(Recurrence::daily()->times(3))->get();
+        [$masterRecord, $override] = app(CalendarStore::class)->upsertRecurringSeries(
+            $from,
+            $master,
+            [Event::build()->uid('moving-series')->recurrenceId($slot)
+                ->starts(DateTimeValue::utc(new \DateTimeImmutable('2026-08-16 11:00:00 UTC')))->summary('Moved')->get()],
+        );
+
+        app(CalendarStore::class)->replaceEvent($masterRecord, $master, $to->getKey());
+
+        $override->refresh();
+        $this->assertSame(0, $from->events()->count());
+        $this->assertSame(2, $to->events()->count());
+        $this->assertSame((string) $to->getKey(), (string) $override->getAttribute('calendar_id'));
+        $this->assertSame($masterRecord->getKey(), $override->getAttribute('recurring_master_id'));
+        $occurrences = app(StoredCalendarExporter::class)->calendar($to->refresh())->occurrencesBetween(
+            new \DateTimeImmutable('2026-08-16 00:00:00 UTC'),
+            new \DateTimeImmutable('2026-08-16 23:59:59 UTC'),
+        );
+        $this->assertCount(1, $occurrences);
+        $this->assertSame('Moved', $occurrences[0]->event->summary());
+    }
+
+    public function test_moving_a_master_under_a_new_uid_leaves_the_old_series_overrides(): void
+    {
+        $start = DateTimeValue::utc(new \DateTimeImmutable('2026-08-15 09:00:00 UTC'));
+        $slot = DateTimeValue::utc(new \DateTimeImmutable('2026-08-16 09:00:00 UTC'));
+        $from = app(CalendarStore::class)->create('From');
+        $to = app(CalendarStore::class)->create('To');
+        [$masterRecord, $override] = app(CalendarStore::class)->upsertRecurringSeries(
+            $from,
+            Event::build()->uid('old-uid')->starts($start)->recurrence(Recurrence::daily()->times(2))->get(),
+            [Event::build()->uid('old-uid')->recurrenceId($slot)->summary('Override')->get()],
+        );
+
+        app(CalendarStore::class)->replaceEvent($masterRecord, Event::build()->uid('new-uid')->starts($start)->get(), $to->getKey());
+
+        $this->assertSame((string) $from->getKey(), (string) $override->refresh()->getAttribute('calendar_id'));
+        $this->assertNull($override->getAttribute('recurring_master_id'));
     }
 
     public function test_application_deletion_uses_foreign_key_cascades_and_nulls_override_links(): void

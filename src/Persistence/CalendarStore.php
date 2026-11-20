@@ -149,15 +149,23 @@ final class CalendarStore
         $this->guard->ensureEnabled();
         EventIdentity::assertValid($event);
         $this->revisions->compare($event, $event);
+        $previousCalendarId = $record->exists ? ModelValue::foreignKey($record, 'calendar_id') : null;
+        $previousUidHash = $record->getAttribute('uid_hash');
         $calendarId ??= ModelValue::foreignKey($record, 'calendar_id');
         $calendarClass = ModelRegistry::calendar();
         $calendar = $calendarClass::query()->whereKey($calendarId)->firstOrFail();
         $timeZones = $this->timeZones($calendar);
 
-        $record->getConnection()->transaction(function () use ($record, $event, $calendarId, $timeZones): void {
+        $record->getConnection()->transaction(function () use ($record, $event, $calendarId, $timeZones, $previousCalendarId, $previousUidHash): void {
             $this->events->fill($record, $calendarId, $event, $timeZones);
             $record->save();
             $this->events->reconcileChildren($record, $event);
+            if ($event->recurrenceId() === null
+                && $previousCalendarId !== null
+                && (string) $previousCalendarId !== (string) $calendarId
+                && $previousUidHash === $record->getAttribute('uid_hash')) {
+                $this->moveSeriesOverrides($previousCalendarId, $calendarId, $record, $timeZones);
+            }
             $this->linkSeriesComponent($record, $event);
         });
 
@@ -186,6 +194,29 @@ final class CalendarStore
 
             return $records;
         });
+    }
+
+    /**
+     * A master moved to another calendar takes its detached overrides along, so they
+     * are not left behind as orphans whose RECURRENCE-ID no longer has a series.
+     */
+    private function moveSeriesOverrides(
+        int|string $fromCalendarId,
+        int|string $toCalendarId,
+        Model $master,
+        TimeZoneResolver $timeZones,
+    ): void {
+        $class = ModelRegistry::event();
+        $overrides = $class::query()
+            ->where('calendar_id', $fromCalendarId)
+            ->where('uid_hash', $master->getAttribute('uid_hash'))
+            ->whereNotNull('recurrence_id_value')
+            ->get();
+
+        foreach ($overrides as $override) {
+            $this->events->fill($override, $toCalendarId, $this->events->toCore($override), $timeZones);
+            $override->save();
+        }
     }
 
     private function linkSeriesComponent(Model $record, Event $event): void
